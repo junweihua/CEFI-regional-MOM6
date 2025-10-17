@@ -1,0 +1,50 @@
+for mac computer:
+
+brew install cdo
+brew install nco
+
+note:
+
+cdo setmisstonn "${file}" "filled/${target_file}"
+is the better choice compared to xarray.interp_na(dim='lat',method='nearest').interp_na(dim='lon',method='nearest).... since cdo finds the nearest valid value based on real distance
+
+in terminal:
+#find: itself is a loop, find files one by one and output them one by one
+#-type f: only find files not folders
+#-exec: for every file found by find, execute following command
+#sh -c: executes a mini-script passed as a string
+#'$0' is the first argument
+#
+#copy below in terminal and run, modify the file folder based on specific situation
+
+find glory_data/* -type f -exec sh -c '
+    file="$0"
+    filename="${file##*/}"
+    
+    # Define the output file path
+    output_file="filled/${filename}"
+
+    # Check if the output file already exists
+    if [ -e "${output_file}" ]; then
+        # If it exists, print a message and do nothing
+        echo "Skipping ${filename}, already exists."
+    else
+        # If it does not exist, run the commands
+        cdo setmisstonn "${file}" "${output_file}"
+        ncks -4 -L 5 "${output_file}" -O "${output_file}"
+    fi
+' {} \;
+
+#sometimes the job wont be able to finish at once, and the latest file in filled/* is very likely problematic, delete it
+
+# Find the latest file, store its name, print it, and then remove it
+# ls -t: This is the list command with the -t flag, which sorts its input by modification time, showing the newest files first.
+#{} +: Instead of running ls -t for every single file (find itself is a loop) (which wouldn't work for sorting), 
+#the + at the end gathers all the file paths found by find and passes them as one long list to a single ls -t command.
+# | (The Pipe): This takes the entire output of the ls -t command (the list of all files, sorted newest to oldest) and "pipes" it as the input to the next command.
+# head -n 1: This command reads its input and prints only the first line (-n 1).
+
+
+latest_file=$(find filled/* -type f -exec ls -t {} + | head -n 1)
+echo "Removing latest (likely broken) file: ${latest_file}"
+rm "${latest_file}"
