@@ -14,7 +14,8 @@ in terminal:
 #-exec: for every file found by find, execute following command
 #sh -c: executes a mini-script passed as a string
 #'$0' is the first argument
-#
+# ncks -4: to netcdf4
+#      -L: compress the size of the file (from 600mb to 80 roughly)
 #copy below in terminal and run, modify the file folder based on specific situation
 
 find glory_data/* -type f -exec sh -c '
