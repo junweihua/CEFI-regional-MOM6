@@ -13,6 +13,12 @@ in terminal:
 #-type f: only find files not folders
 #-exec: for every file found by find, execute following command
 #sh -c: executes a mini-script passed as a string
+# ##: A "remove prefix" operator. The double ## means it removes the longest possible match
+# */: The pattern to remove. This means "match any sequence of characters (*) that ends with a forward slash (/)".
+# example: file="/home/jhua/my_project/script.sh"
+# ${file##*/}
+# Longest match for */: /home/jhua/my_project/
+# ${file##*/} = script.sh
 #'$0' is the first argument
 # ncks -4: to netcdf4
 #      -L: compress the size of the file (from 600mb to 80 roughly)
